@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LOSTOM INDUSTRIES - Order Form</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  background:#ffffff;
+  padding:15px;
+}
+.header{
+  border-bottom:2px solid #000;
+  margin-bottom:15px;
+  background-color: #c4e9f2;
+}
+.header h1{
+  margin:0;
+  color:#292a2b;
+  text-align: center;
+  text-decoration: underline;
+  
+  
+}
+.header p{
+  margin:4px 0;
+  font-size:14px;
+}
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:15px;
+}
+.info input{
+  padding:6px;
+  width:100%;
+}
+button{
+  padding:6px 10px;
+  cursor:pointer;
+}
+.addbtn{
+  background:#0b5394;
+  color:#fff;
+  border:none;
+}
+.submitbtn{
+  background:#25D366;
+  color:#fff;
+  border:none;
+  width:100%;
+  font-size:16px;
+  padding:10px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+table th, table td{
+  border:1px solid #ccc;
+  padding:5px;
+  text-align:center;
+}
+table th{
+  background:#f0f0f0;
+}
+.total{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.total input{
+  padding:6px;
+  font-weight:bold;
+}
+.footer{
+  margin-top:15px;
+  font-size:12px;
+  text-align:center;
+  color:#555;
+}
+a{
+    color:blue;
+    margin-left: 800px;
+    
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Lostom snacks</h1>
+    <a href="https://www.lostomindustries.com">www.lostomindustries.com</a>
+    
+  </div>
+
+  <div class="info">
+    <div>
+      Party / Shop Name<br>
+      <input id="party">
+    </div>
+    <div>
+      Mobile Number<br>
+      <input id="mobile">
+    </div>
+    <div>
+      Sales Person Name<br>
+      <input id="sales">
+    </div>
+    <div>
+      Order Date<br>
+      <input type="date" id="date">
+    </div>
+  </div>
+
+  <button class="addbtn" onclick="addRow()">➕ Add Product Row</button>
+
+  <table id="t">
+    <tr>
+      <th>Sr</th>
+      <th>Product Name</th>
+      <th>Qty</th>
+      <th>Rate</th>
+      <th>Amount (Manual)</th>
+      <th>Delete</th>
+    </tr>
+  </table>
+
+  <div class="total">
+    <div>
+      Total Quantity<br>
+      <input id="totalQty" readonly>
+    </div>
+    <div>
+      Total Amount (₹)<br>
+      <input id="totalAmt" readonly>
+    </div>
+  </div>
+
+  <br>
+  <button class="submitbtn" onclick="sendOrder()">Submit Order on WhatsApp</button>
+
+  <div class="footer">
+   2010 © Lostom snacks| All Rights Reserved
+  </div>
+
+</div>
+
+<script>
+var count = 0;
+
+function addRow(){
+  count++;
+  var table = document.getElementById("t");
+  var row = table.insertRow(-1);
+
+  row.insertCell(0).innerHTML = count;
+  row.insertCell(1).innerHTML = "<input style='width:100%'>";
+  row.insertCell(2).innerHTML = "<input type='number' oninput='calculate()'>";
+  row.insertCell(3).innerHTML = "<input type='number'>";
+  row.insertCell(4).innerHTML = "<input type='number' oninput='calculate()'>";
+  row.insertCell(5).innerHTML = "<button onclick='deleteRow(this)'>X</button>";
+}
+
+function deleteRow(btn){
+  var row = btn.parentNode.parentNode;
+  row.parentNode.removeChild(row);
+  calculate();
+}
+
+function calculate(){
+  var table = document.getElementById("t");
+  var tq = 0;
+  var ta = 0;
+
+  for(var i=1;i<table.rows.length;i++){
+
+    var qty = parseFloat(
+      table.rows[i].cells[2].getElementsByTagName("input")[0].value
+    ) || 0;
+
+    var amt = parseFloat(
+      table.rows[i].cells[4].getElementsByTagName("input")[0].value
+    ) || 0;
+
+    tq += qty;
+    ta += amt;
+  }
+
+  document.getElementById("totalQty").value = tq.toFixed(2);
+  document.getElementById("totalAmt").value = ta.toFixed(2);
+}
+
+function sendOrder(){
+  var msg = "LOSTOM INDUSTRIES ORDER\n";
+  msg += "Website: www.lostomindustries.com\n\n";
+  msg += "Party: " + party.value + "\n";
+  msg += "Mobile: " + mobile.value + "\n";
+  msg += "Sales: " + sales.value + "\n";
+  msg += "Date: " + date.value + "\n\n";
+
+  var table = document.getElementById("t");
+  for(var i=1;i<table.rows.length;i++){
+    msg += i + ") ";
+    msg += table.rows[i].cells[1].getElementsByTagName("input")[0].value + " | ";
+    msg += "Qty: " + table.rows[i].cells[2].getElementsByTagName("input")[0].value + " | ";
+    msg += "Amount: ₹" + table.rows[i].cells[4].getElementsByTagName("input")[0].value + "\n";
+  }
+
+  msg += "\nTotal Qty: " + totalQty.value;
+  msg += "\nTotal Amount: ₹" + totalAmt.value;
+
+  var phone = "917033810886";   // ← अपना WhatsApp नंबर डालें
+  window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(msg));
+}
+
+// default 5 rows
+for(var i=0;i<5;i++){ addRow(); }
+</script>
+
+</body>
+</html>
